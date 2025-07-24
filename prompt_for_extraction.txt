@@ -1,0 +1,566 @@
+prompt = f"""
+You are a bank support AI assistant.
+
+Your job is to extract the following fields from the customer's email. These values may appear in various formats, such as uppercase, abbreviations, or colon/dash-separated text.
+
+Extract the following (if available):
+
+1. Account Number — may appear as:
+   - "Account No", "A/c No", "AC NO", etc.
+
+2. User ID — may appear as:
+   - "User ID", "Userid", "Login ID", etc.
+
+3. Mobile Number — may appear as:
+   - "Mobile", "Phone", "Contact Number", etc.
+   - Can include country code or symbols
+
+4. Email Address — may appear as:
+   - "Email", "Email ID", "Mail ID", etc.
+   - Sometimes repeated in brackets like [xyz@example.com]
+
+Return your output strictly in this JSON format:
+
+{{
+  "account_number": "...",
+  "user_id": "...",
+  "mobile_number": "...",
+  "email": "..."
+}}
+
+If a field is not present, return it as an empty string "".
+
+---
+
+Expected Output:
+{{
+  "account_number": "...........",
+  "user_id": "...........",
+  "mobile_number": "..........",
+  "email": "..."
+}}
+
+---
+
+Now process the following email:
+
+Email:
+{email}
+"""
+
+
+
+
+
+
+
+prompt = f"""
+Extract the following entities from the given email. The terms may appear in various formats:
+
+1. Account Number — may appear as "AC NO", "A/c", "Account number", etc.
+2. Mobile Number — can be 10-digit number with or without separators.
+3. Email ID — may be written as "EMAIL ID", "Email", "E-mail".
+4. Name — typically appears after "AC NAME", "Account Holder", or "Mr./Ms."
+
+Return your output strictly in this format:
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "Name": "...",
+  "Mobile Number": "...",
+  "Email ID": "..."
+}}
+
+Example:
+Email:
+"40263401618 AC NO - 60447820881 AC NAME - Mr. PATEL RUSHIT MADHUSUDHAN MOBILE NO. - 919429318828 EMAIL ID - rushitpatel91910@gmail.com"
+Output:
+{{
+  "Account Number 1": "40263401618",
+  "Account Number 2": "60447820881",
+  "Name": "Mr. PATEL RUSHIT MADHUSUDHAN",
+  "Mobile Number": "919429318828",
+  "Email ID": "rushitpatel91910@gmail.com"
+}}
+
+Now extract from this email:
+{email}
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(4)
+prompt = f"""
+Extract the following details from the email. If a value is missing, use null:
+
+- Account Number: 11-digit number, may appear as "AC NO", "A/c", etc.
+- Mobile Number: 10-digit, may include separators
+- Email ID: appears as "Email", "EMAIL ID", etc.
+- Name: usually follows "AC NAME", "Mr.", "Ms.", etc.
+- User ID: may appear as "User ID", "Login ID", etc.
+- Corporate ID: may appear as "Corporate ID", "Corp login", etc.
+
+Respond in JSON format only:
+
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "Name": "...",
+  "Mobile Number": "...",
+  "Email ID": "...",
+  "User ID": "...",
+  "Corporate ID": "..."
+}}
+
+Email:
+{email}
+"""
+
+
+
+(5)
+
+prompt = f"""
+Extract the following entities from the given email. Normalize all field names and formats in the output. If any field is not present, return its value as null. Output should be valid JSON with these exact keys:
+
+- "AC/No 1"
+- "AC/No 2"
+- "Name"
+- "Mobile Number"
+- "Email ID"
+- "User ID"
+- "Corporate ID"
+
+Guidelines:
+- For account numbers, accept formats like "A/c No", "Account Number", "AC NO", etc., but output must always use "AC/No" as key.
+- For email, handle variations like "EMAIL", "E-mail", "EMAIL ID", etc., but always use "Email ID" in output.
+- For mobile number, accept 10-digit values with/without symbols (e.g., dashes or country codes).
+- For name, look for labels like "AC NAME", "Account Holder", or "Mr./Ms." but use "Name" in output.
+- For user ID or corporate ID, standardize to keys "User ID" and "Corporate ID" regardless of input variation.
+
+Only return the JSON object. Do not include any explanations or copied labels.
+
+Email:
+{email}
+"""
+
+
+
+(6)
+prompt = f"""
+You are an intelligent banking assistant. Extract the following entities from the email. These may appear in various formats or spellings:
+
+1. Account Number – appears as "AC NO", "A/c", "Account No.", etc. (11-digit number).
+2. User ID – may be written as "USER ID", "Userid", etc.
+3. Corporate ID – may appear as "Corporate ID", "Corp ID", "CorpID", etc.
+4. CIF Number – also known as "Customer Information File number".
+5. Mobile Number – a 10-digit number, may include separators or country code.
+6. Email ID – formats like "EMAIL ID", "Email", or "E-mail".
+
+Return only if the entity is present. Use this strict JSON format with standard keys (do not change based on input variation):
+
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "User ID": "...",
+  "Corporate ID": "...",
+  "CIF Number": "...",
+  "Mobile Number": "...",
+  "Email ID": "..."
+}}
+
+Ensure extracted values are cleaned (e.g., remove "AC NO -", "Email:", etc.) and mapped to the above JSON keys.
+
+Now extract from this email:
+{email}
+"""
+Hello Sir,
+Please find attached the Expense Reimbursement Sheet for the month of June 2025. Kindly let me know if any additional details are required.
+
+Thanks and regards
+Ajit Rawat
+
+June_2025 Reimbursement Approval request
+
+i have 1442 data on label sudio okay so what i want is that i have ml  backend connected with label studio with bert classification sentiment so the model 
+wil precit that the email falls in which category it is like intertnet baning > unblock , or mobile banking > payment issue and so on so i the data is coming to my label studi
+from my own platfrom actionbl wiht labelling and i want to start training so what should be the number of epoches and and one more probelm is there prevoisuy iran the training
+but the prediction were bad so what should i do with
+
+so bsially we receive mails on our portal so we need to classify them into categories like 
+internet banking > request > unlock 
+mobile banking > transaction > money debited adn so one we have 200 such categories as of now so we want whatever the new mail will come the moidel should lassify them
+into one of the following 200 categoires so which would be the best option ?
+
+
+
+
+so i want to know how an why this is happening
+
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+model_name = 'google/flan-t5-large'
+tokenizer = T5Tokenizer.from_pretrained(model_name)
+model = T5ForConditionalGeneration.from_pretrained(model_name)
+
+
+prompt = f"""
+Extract the following entities from the given email. The terms may appear in various formats:
+
+1. Account Number — may appear as "AC NO", "A/c", "Account number", etc.
+2. Mobile Number — can be 10-digit number with or without separators.
+3. Email ID — may be written as "EMAIL ID", "Email", "E-mail".
+4. Name — typically appears after "AC NAME", "Account Holder", or "Mr./Ms."
+
+Return your output strictly in this format:
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "Name": "...",
+  "Mobile Number": "...",
+  "Email ID": "..."
+}}
+
+Example:
+Email:
+"40263401618 AC NO - 60447820881 AC NAME - Mr. PATEL RUSHIT MADHUSUDHAN MOBILE NO. - 919429318828 EMAIL ID - rushitpatel91910@gmail.com"
+Output:
+{{
+  "Account Number 1": "40263401618",
+  "Account Number 2": "60447820881",
+  "Name": "Mr. PATEL RUSHIT MADHUSUDHAN",
+  "Mobile Number": "919429318828",
+  "Email ID": "rushitpatel91910@gmail.com"
+}}
+
+Now extract from this email:
+{email}
+"""
+
+inputs=tokenizer(prompt,return_tensors="pt",truncation=True,max_length=1024)
+outputs=model.generate(**inputs,max_new_tokens=200)
+response=tokenizer.decode(outputs[0],skip_special_tokens=True)
+print(response)
+
+
+so this is the code with prompt okay so code part is workig fine but when running this code on the 
+email="""
+Account no.-60490639765
+Name- Rusha Mercantile Alliance
+Corporate ID-rusvp00001
+User ID-yaswv00001
+
+
+"""
+output = Output:  "Account no.-60490639765", "Name": "Rusha Mercantile Alliance", "Corporate ID": "rusvp00001", "User ID": "yaswv00001"
+
+but when giving example 2 
+
+email="""
+Please find attached the customer request for enabling bulk payment mode in their internet banking facility.
+
+Account no.-60490639765
+
+notifications
+
+Name- Rusha Mercantile Alliance
+
+
+Request raised-enabling bulk payment mode in IB
+
+Sent Mails
+
+Corporate ID-rusvp00001
+
+User ID-yaswv00001
+
+"""
+
+output=Output:  "Rusha Mercantile Alliance"
+
+
+then example 3 
+email="""
+Hi, So i mam writing this mail just to test nmy model's prediction okay,
+Request raised-enabling bulk payment mode in IB
+Sent Mails
+
+dear Sir,my account number is 11112222333,
+
+
+and my id user is ajit12345
+
+Please find attached the customer request for enabling bulk payment mode in their internet banking facility.
+
+and my if for corporate is ccc34567
+
+Sent Mails
+
+my email is tester23@gmail.com
+
+
+
+
+phone numbe is +2345612343333"""
+
+output = Output:  "Request raised-enabling bulk payment mode in IB"
+
+
+then example 4= 
+
+email="""
+Hi, So i mam writing this mail just to test nmy model's prediction okay,
+
+
+dear Sir,my account number is 11112222333,
+
+
+and my id user is ajit12345
+
+.
+
+and my if for corporate is ccc34567
+
+
+my email is tester23@gmail.com
+
+
+
+
+phone numbe is +2345612343333"""
+
+output= Output:  "Account Number": "11112222333", "Account ID": "ajit12345", "If for corporate": "ccc34567", "Email": "tester23@gmail.com", "Mobile Number": +2345612343333
+
+
+
+
+
+
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import re
+
+# Load model and tokenizer
+model_name = "google/flan-t5-large"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+
+# Define email sample
+email = """
+Please find attached the customer request for enabling bulk payment mode in their internet banking facility.
+Account no.-60490639765 notifications
+Name- Rusha Mercantile Alliance
+Request raised-enabling bulk payment mode in IB
+Sent Mails
+Corporate ID-rusvp00001
+User ID-yaswv00001
+"""
+
+# Prompt template with User ID and Corporate ID included
+prompt_template = """
+Extract the following details from the email:
+- Account Numbers
+- Name
+- Mobile Number
+- Email ID
+- Corporate ID
+- User ID
+
+Email:
+{email}
+
+Return output as key-value pairs like:
+Account Number 1: ...
+Account Number 2: ...
+Name: ...
+Mobile Number: ...
+Email ID: ...
+Corporate ID: ...
+User ID: ...
+"""
+
+# Format the prompt
+prompt = prompt_template.format(email=email)
+
+# Tokenize and generate
+inputs = tokenizer(prompt, return_tensors="pt", max_length=1024, truncation=True)
+outputs = model.generate(**inputs, max_new_tokens=256)
+output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+# Use regex to extract from output OR fallback to raw email
+def extract_field(pattern, text):
+    match = re.search(pattern, text, re.IGNORECASE)
+    return match.group(1).strip() if match else ""
+
+data = {
+    "Account Number 1": extract_field(r"Account Number 1:\s*(.+)", output_text) or extract_field(r"Account no\.\-?\s*(\d+)", email),
+    "Account Number 2": extract_field(r"Account Number 2:\s*(.+)", output_text),
+    "Name": extract_field(r"Name:\s*(.+)", output_text) or extract_field(r"Name[\-:]?\s*(.+)", email),
+    "Mobile Number": extract_field(r"Mobile Number:\s*(.+)", output_text) or extract_field(r"(?:Mobile Number|MOBILE NO)[\s\-:]*(\+?\d{10,15})", email),
+    "Email ID": extract_field(r"Email ID:\s*(.+)", output_text) or extract_field(r"Email[\s\-:]*(\S+@\S+)", email),
+    "Corporate ID": extract_field(r"Corporate ID:\s*(.+)", output_text) or extract_field(r"Corporate ID[\-:]?\s*(\w+)", email),
+    "User ID": extract_field(r"User ID:\s*(.+)", output_text) or extract_field(r"User ID[\-:]?\s*(\w+)", email)
+}
+
+# Final Output
+print("\n📤 Final Extracted Output:")
+print(data)
+
+
+
+
+
+
+import json
+import os
+
+def convert_labelstudio_ner_to_flant5_format(
+    labelstudio_json_path: str,
+    output_jsonl_path: str,
+    target_entities: list = None,
+    prompt_template: str = "Extract the {entities} from the following text: {text}",
+    no_entity_found_response: str = "None"
+):
+    """
+    Converts a Label Studio NER JSON export file into a JSON Lines (.jsonl)
+    format suitable for fine-tuning FLAN-T5 for entity extraction.
+
+    Args:
+        labelstudio_json_path (str): Path to your Label Studio exported JSON file.
+        output_jsonl_path (str): Path where the converted JSON Lines file will be saved.
+        target_entities (list, optional): A list of entity labels you are interested in.
+                                          If None, all unique labels found in the data will be used.
+                                          Example: ["PER", "ORG", "LOC", "MISC"].
+        prompt_template (str): The template for the input prompt.
+                               Placeholder {entities} will be replaced by the list of target entities.
+                               Placeholder {text} will be replaced by the original document text.
+        no_entity_found_response (str): The response string to use when no target entities
+                                        are found in the document. Defaults to "None".
+    """
+    
+    if not os.path.exists(labelstudio_json_path):
+        raise FileNotFoundError(f"Label Studio JSON export not found at: {labelstudio_json_path}")
+
+    with open(labelstudio_json_path, "r", encoding="utf-8") as f:
+        labelstudio_data = json.load(f)
+
+    flant5_examples = []
+    
+    if target_entities is None:
+        # Auto-discover unique labels if not provided
+        discovered_labels = set()
+        for entry in labelstudio_data:
+            if "annotations" in entry and entry["annotations"]:
+                for ann in entry["annotations"][0].get("result", []): # Assuming first annotation result
+                    if "labels" in ann["value"]:
+                        for label in ann["value"]["labels"]:
+                            discovered_labels.add(label)
+        target_entities = sorted(list(discovered_labels))
+        print(f"Auto-discovered target entities: {target_entities}")
+
+    # Format entity names for the prompt (e.g., "account number" -> "account number")
+    formatted_entity_names = [label.replace('_', ' ').title() for label in target_entities]
+    entities_in_prompt = ", ".join(formatted_entity_names)
+
+
+    for i, entry in enumerate(labelstudio_data):
+        # Ensure the entry has the expected structure
+        if "data" not in entry or "annotations" not in entry:
+            print(f"Skipping entry {i} due to unexpected structure: {entry.keys()}")
+            continue
+
+        text = entry["data"].get("text")
+        if not text:
+            print(f"Skipping entry {i} due to missing 'text' field in 'data'.")
+            continue
+
+        annotations = entry["annotations"][0].get("result", []) # Assuming the first annotation result
+        
+        extracted_entities_for_doc = []
+        for ann in annotations:
+            # Check if it's a "labels" type annotation (for NER)
+            if ann.get("type") == "labels" and "labels" in ann["value"]:
+                label = ann["value"]["labels"][0] # Assuming single label per span
+                
+                # Only include entities that are in our target_entities list
+                if label in target_entities:
+                    start = ann["value"]["start"]
+                    end = ann["value"]["end"]
+                    entity_text = text[start:end]
+                    
+                    # Format the entity output for the target string
+                    formatted_label = label.replace('_', ' ').title() # E.g., "account number" -> "Account Number"
+                    extracted_entities_for_doc.append(f"{formatted_label}: {entity_text}")
+        
+        # Construct the FLAN-T5 input (prompt)
+        input_text = prompt_template.format(entities=entities_in_prompt, text=text)
+        
+        # Construct the FLAN-T5 output (target)
+        # Sort for consistent output order, although FLAN-T5 is flexible
+        target_text = "; ".join(sorted(extracted_entities_for_doc)) if extracted_entities_for_doc else no_entity_found_response
+        
+        flant5_examples.append({"input": input_text, "target": target_text})
+    
+    # Save the processed data to a JSON Lines file
+    with open(output_jsonl_path, "w", encoding="utf-8") as f:
+        for example in flant5_examples:
+            f.write(json.dumps(example) + "\n")
+            
+    print(f"Successfully converted {len(flant5_examples)} examples to {output_jsonl_path}")
+    print(f"Example of generated data:")
+    if flant5_examples:
+        print(json.dumps(flant5_examples[0], indent=2))
+    else:
+        print("No examples were generated.")
+
+# --- Configuration ---
+# Path to your Label Studio JSON export file
+LABELSTUDIO_EXPORT_FILE = "/content/Label_Studio_export_ForFinetuning.json" 
+
+# Path where the FLAN-T5 compatible JSONL file will be saved
+FLANT5_OUTPUT_FILE = "flant5_ner_data.jsonl"
+
+# Your specific entity labels
+MY_ENTITY_LABELS = ["PER", "ORG", "LOC", "MISC"]
+
+# Prompt template - you can customize this!
+# {entities} will be replaced by "Account Number, User ID, Corporate ID, Mobile Number, Email"
+# {text} will be replaced by the content of the email
+PROMPT_TEMPLATE = "Extract the following entities from the text: {entities}. Text: {text}"
+
+# Response when no entities are found in the text
+NO_ENTITY_RESPONSE = "None found"
+
+
+# --- Run the conversion ---
+if __name__ == "__main__":
+    try:
+        convert_labelstudio_ner_to_flant5_format(
+            labelstudio_json_path=LABELSTUDIO_EXPORT_FILE,
+            output_jsonl_path=FLANT5_OUTPUT_FILE,
+            target_entities=MY_ENTITY_LABELS,
+            prompt_template=PROMPT_TEMPLATE,
+            no_entity_found_response=NO_ENTITY_RESPONSE
+        )
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        print("Please ensure 'my_labelstudio_export.json' is in the same directory or provide the correct path.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+
+
+
+
