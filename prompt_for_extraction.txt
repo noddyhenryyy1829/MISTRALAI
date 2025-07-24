@@ -564,3 +564,169 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+# Fine tune Flan T-5 large with label-studio annonated data for entiity extraction and 
+have exported the label-studio annonations to json format and by python script the json was succesfully converted to 
+Flan suitable format but now i m referencing a website for fine tuning but they are loading daataset from huging face but i have 
+dataset in my local system in json format so how to load and what to do
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Load the tokenizer, model, and data collator
+MODEL_NAME = "google/flan-t5-base"
+
+tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME)
+model = T5ForConditionalGeneration.from_pretrained(MODEL_NAME)
+data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model)
+
+
+
+# Acquire the training data from Hugging Face
+DATA_NAME = "yahoo_answers_qa"
+yahoo_answers_qa = load_dataset(DATA_NAME)
+
+
+yahoo_answers_qa = yahoo_answers_qa["train"].train_test_split(test_size=0.3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import json
+import torch
+from datasets import Dataset
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSeq2SeqLM,
+    TrainingArguments,
+    Trainer
+)
+
+# --------------------------
+# STEP 1: Load JSONL dataset
+# --------------------------
+def load_jsonl(file_path):
+    data = []
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            data.append(json.loads(line.strip()))
+    return data
+
+data_path = "flan_finetune_data.jsonl"  # Update if needed
+raw_data = load_jsonl(data_path)
+dataset = Dataset.from_list(raw_data)
+dataset = dataset.train_test_split(test_size=0.1)
+
+# --------------------------
+# STEP 2: Preprocessing
+# --------------------------
+model_checkpoint = "google/flan-t5-large"  # You can switch to flan-t5-base
+tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+
+def preprocess(example):
+    model_inputs = tokenizer(
+        example["input"],
+        max_length=512,
+        truncation=True,
+        padding="max_length"
+    )
+    labels = tokenizer(
+        example["output"],
+        max_length=128,
+        truncation=True,
+        padding="max_length"
+    )
+    model_inputs["labels"] = labels["input_ids"]
+    return model_inputs
+
+tokenized_dataset = dataset.map(preprocess)
+
+# --------------------------
+# STEP 3: Load model
+# --------------------------
+model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint)
+
+# --------------------------
+# STEP 4: Training Arguments
+# --------------------------
+training_args = TrainingArguments(
+    output_dir="./flan-t5-entity-extractor",
+    evaluation_strategy="epoch",
+    save_strategy="epoch",
+    learning_rate=5e-5,
+    per_device_train_batch_size=2,
+    per_device_eval_batch_size=2,
+    num_train_epochs=3,
+    weight_decay=0.01,
+    save_total_limit=2,
+    load_best_model_at_end=True,
+    logging_dir="./logs",
+    logging_steps=10,
+    report_to="none",
+    no_cuda=True  # Important: forces CPU mode
+)
+
+# --------------------------
+# STEP 5: Train
+# --------------------------
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_dataset["train"],
+    eval_dataset=tokenized_dataset["test"],
+    tokenizer=tokenizer
+)
+
+trainer.train()
+
+# --------------------------
+# STEP 6: Save final model
+# --------------------------
+trainer.save_model("./flan-t5-entity-extractor")
+tokenizer.save_pretrained("./flan-t5-entity-extractor")
+
+print("✅ Fine-tuning complete. Model saved to ./flan-t5-entity-extractor")
+
