@@ -1,0 +1,100 @@
+!pip install -q transformers datasets accelerate
+
+
+import json
+from datasets import Dataset
+
+# Load local JSONL file into a list of dicts
+file_path = "/content/flan_finetune_data.jsonl"
+
+data = []
+with open(file_path, "r", encoding="utf-8") as f:
+    for line in f:
+        data.append(json.loads(line))
+
+# Convert to HuggingFace dataset
+dataset = Dataset.from_list(data)
+dataset = dataset.train_test_split(test_size=0.1)
+
+
+
+
+
+
+from transformers import T5Tokenizer
+
+model_name = "google/flan-t5-large"
+tokenizer = T5Tokenizer.from_pretrained(model_name)
+
+def preprocess(example):
+    model_input = tokenizer(example["input"], padding="max_length", truncation=True, max_length=256)
+    with tokenizer.as_target_tokenizer():
+        labels = tokenizer(example["output"], padding="max_length", truncation=True, max_length=128)
+    model_input["labels"] = labels["input_ids"]
+    return model_input
+
+tokenized = dataset.map(preprocess, batched=True)
+
+
+
+
+
+from transformers import T5ForConditionalGeneration, TrainingArguments, Trainer, DataCollatorForSeq2Seq
+
+model = T5ForConditionalGeneration.from_pretrained(model_name)
+
+training_args = TrainingArguments(
+    output_dir="./flan_t5_entity_extractor",
+    #evaluation_strategy="epoch",
+    learning_rate=3e-4,
+    per_device_train_batch_size=4,
+    per_device_eval_batch_size=4,
+    num_train_epochs=5,
+    weight_decay=0.01,
+    save_total_limit=2,
+    fp16=False,
+    logging_dir='./logs',
+    logging_steps=10,
+    report_to="none",  # <-- Disable W&B, TensorBoard, etc.
+)
+
+
+
+data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model)
+
+
+#To disable WAND 
+#WAND - Weights updates we dont need to publish
+import os
+os.environ["WANDB_DISABLED"] = "true"
+
+
+
+from transformers import ProgressCallback
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized["train"],
+    eval_dataset=tokenized["test"],
+    data_collator=data_collator,
+    tokenizer=tokenizer,
+    callbacks=[ProgressCallback()],  # ✅ adds a live progress bar
+)
+trainer.train()
+
+
+#To save the model if not saved automatically 
+trainer.save_model("./flan_t5_entity_extractor")
+
+
+
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+model_path = "./flan_t5_entity_extractor"
+tokenizer = T5Tokenizer.from_pretrained(model_path)
+model = T5ForConditionalGeneration.from_pretrained(model_path)
+input_text = "Extract named entities from this text:  and i work at featsystems"
+inputs = tokenizer(input_text, return_tensors="pt").to(model.device)
+outputs = model.generate(**inputs)
+print("Prediction:", tokenizer.decode(outputs[0], skip_special_tokens=True))
+
