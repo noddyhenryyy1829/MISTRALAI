@@ -1,0 +1,32 @@
+prompt = f"""
+Extract the following entities from the given email. The terms may appear in various formats:
+
+1. Account Number — may appear as "AC NO", "A/c", "Account number", etc.
+2. Mobile Number — can be 10-digit number with or without separators.
+3. Email ID — may be written as "EMAIL ID", "Email", "E-mail".
+4. Name — typically appears after "AC NAME", "Account Holder", or "Mr./Ms."
+
+Return your output strictly in this format:
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "Name": "...",
+  "Mobile Number": "...",
+  "Email ID": "..."
+}}
+
+Example:
+Email:
+"40263401618 AC NO - 60447820881 AC NAME - Mr. PATEL RUSHIT MADHUSUDHAN MOBILE NO. - 919429318828 EMAIL ID - rushitpatel91910@gmail.com"
+Output:
+{{
+  "Account Number 1": "40263401618",
+  "Account Number 2": "60447820881",
+  "Name": "Mr. PATEL RUSHIT MADHUSUDHAN",
+  "Mobile Number": "919429318828",
+  "Email ID": "rushitpatel91910@gmail.com"
+}}
+
+Now extract from this email:
+{email}
+"""
